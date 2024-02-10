@@ -29,7 +29,8 @@ def random_sleep():
     # sleep from 0.5 to 1.5 seconds
     return secrets.randbelow(1000) / 1000
     # return 0
-
+# Create an event loop
+loop = asyncio.get_event_loop()
 
 from mybot import send_message_to_bot, send_notification
 conn = sqlite3.connect('scraper.db')
@@ -40,7 +41,7 @@ c.execute('''
     )
 ''')
 
-asyncio.run(send_notification("Starting the scraper..."))
+loop.run_until_complete(send_notification("Starting the scraper..."))
 # Function to insert a link into the database
 def insert_link(url):
     try:
@@ -85,9 +86,9 @@ soup = BeautifulSoup(driver.page_source, 'html.parser')
 # Find all <a> tags that contain links similar to "href="/d/oferta/*"
 a_tags = soup.find_all('a', href=re.compile(r'/d/oferta/.*'))
 if len(a_tags) > 0:
-    asyncio.run(send_notification("Found " + str(len(a_tags)) + " links"))
+    loop.run_until_complete(send_notification("Found " + str(len(a_tags)) + " links"))
 else:
-    asyncio.run(send_notification("No links found"))
+    loop.run_until_complete(send_notification("No links found"))
 new_links = 0
 for i, a_tag in enumerate(a_tags):
     # Find the body of the webpage
@@ -134,12 +135,14 @@ for i, a_tag in enumerate(a_tags):
                             "price": p_tag.text
                         }
                         # Send the message to the bot
-                        asyncio.run(send_message_to_bot(obj))
+                        loop.run_until_complete(send_message_to_bot(obj))
             except Exception as e:
                 print(e)
     sleep(random_sleep())
 if not new_links:
-    asyncio.run(send_notification("No new links found"))
+    loop.run_until_complete(send_notification("No new links found"))
+# Close the event loop when you're done
+loop.close()
 # Close the driver
 driver.quit()
 # Close the connection to the database
