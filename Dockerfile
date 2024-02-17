@@ -23,8 +23,6 @@ RUN apt-get update && apt-get install -y \
 # Install Python dependencies
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-# Make port 80 available to the world outside this container
-EXPOSE 80
 
 # Set environment variable
 ENV DOCKER_CONTAINER=1
