@@ -1,0 +1,30 @@
+version: '3'
+services:
+  app:
+    container_name: python-web-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /var/lib/docker/volumes/python-web/:/app/db
+    depends_on:
+      - selenium
+    networks:
+      - python-web-network
+
+  selenium:
+    container_name: python-web-worker
+    image: selenium/standalone-chrome
+    ports:
+      - "4444:4444"
+
+    networks:
+      - python-web-network
+
+networks:
+  python-web-network:
+    driver: bridge
+
+volumes:
+  db:
+    driver: local

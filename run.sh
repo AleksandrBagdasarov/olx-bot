@@ -1,2 +1,13 @@
-docker build -t my-python-app .
-docker run -v $HOME/my-python-app/data:/app/db my-python-app
+#!/bin/bash
+
+# Navigate to the directory containing the docker-compose.yml file
+cd /path/to/your/docker-compose/directory
+
+# Start the Docker Compose services
+docker-compose up -d
+
+# Pause the script for 10 minutes
+sleep 600
+
+# Stop and remove the Docker Compose services, but keep the volumes
+docker-compose down

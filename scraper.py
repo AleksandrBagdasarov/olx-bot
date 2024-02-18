@@ -1,14 +1,18 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import sqlite3
+
+import requests
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 import asyncio
 from time import sleep
 import secrets
 import os
+
 def random_sleep():
     # sleep from 0.5 to 1.5 seconds
     sleep((secrets.randbelow(1000) / 1000) + 0.5)
@@ -38,22 +42,46 @@ def insert_link(url):
 def link_exists(url):
     c.execute('SELECT url FROM links WHERE url = ?', (url,))
     return c.fetchone() is not None
+# Specify the URL of the Selenium Server
+selenium_url = "http://selenium:4444/wd/hub"
+
+def test_selenium_server_available():
+    session = requests.Session()
+    retry = Retry(connect=5, backoff_factor=0.5)
+    adapter = HTTPAdapter(max_retries=retry)
+    session.mount('http://', adapter)
+    session.mount('https://', adapter)
+
+    session.get(selenium_url)
+
+try:
+    for i in range(5):
+        test_selenium_server_available()
+        break
+except:
+    print("Selenium server is not available")
+    os._exit(1)
 
 
 new_links = []
 
 
 # Set up a headless Selenium WebDriver
-options = Options()
-# options.add_argument("--headless")
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-gpu")
 options.add_argument("--disable-extensions")
 options.add_argument("--disable-software-rasterizer")
 options.add_argument("--window-size=1920,1200")
-driver = webdriver.Chrome(options=options)
 
+
+
+driver = webdriver.Remote(
+    command_executor=selenium_url,
+    options=options
+)
 
 def parse_item(href):
     try:
