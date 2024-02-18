@@ -8,7 +8,7 @@ import sqlite3
 import asyncio
 from time import sleep
 import secrets
-
+import os
 def random_sleep():
     # sleep from 0.5 to 1.5 seconds
     sleep((secrets.randbelow(1000) / 1000) + 0.5)
