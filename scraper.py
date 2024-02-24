@@ -101,6 +101,7 @@ def parse_item(href):
 
         # price_container = soup.find('div', attrs={'data-cy': re.compile('^ad-price')})
         price = soup.find('h3').text
+        sleep(10)
         loop.run_until_complete(send_message_to_bot(
             link=f"https://www.olx.pl{href}",
             title=title,
