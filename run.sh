@@ -4,7 +4,7 @@
 cd /root/olx-bot
 
 # Start the Docker Compose services
-docker-compose up -d
+docker compose up -d
 
 # Pause the script for 10 minutes
 sleep 600
