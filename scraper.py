@@ -8,6 +8,7 @@ import sqlite3
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+# from urllib3.util.retry import Retry
 import asyncio
 from time import sleep
 import secrets
@@ -54,13 +55,6 @@ def test_selenium_server_available():
 
     session.get(selenium_url)
 
-try:
-    for i in range(5):
-        test_selenium_server_available()
-        break
-except:
-    print("Selenium server is not available")
-    os._exit(1)
 
 
 new_links = []
@@ -77,11 +71,20 @@ options.add_argument("--disable-software-rasterizer")
 options.add_argument("--window-size=1920,1200")
 
 
+try:
+    for i in range(5):
+        test_selenium_server_available()
+        break
+except:
+    print("Selenium server is not available")
+    os._exit(1)
 
 driver = webdriver.Remote(
     command_executor=selenium_url,
     options=options
 )
+
+# driver = webdriver.Chrome(options=options)
 
 def parse_item(href):
     try:
@@ -100,7 +103,7 @@ def parse_item(href):
         title = title_container.find('h4').text
 
         # price_container = soup.find('div', attrs={'data-cy': re.compile('^ad-price')})
-        price = soup.find('h3').text
+        price = [x.text for x in soup.find_all('h3') if 'zł' in x.text][0]
         sleep(10)
         loop.run_until_complete(send_message_to_bot(
             link=f"https://www.olx.pl{href}",
@@ -132,6 +135,8 @@ def parse_page(url):
     orders = soup.find_all('div', attrs={'data-cy': 'l-card'})
     total_orders = len(orders)
     for i, order in enumerate(orders):
+        if not "Bielsko-Biała" in (soup.find('p', attrs={"data-testid":"location-date"}).text):
+            continue
         order_id = order['id']
         if link_exists(order_id):
             continue
@@ -157,7 +162,9 @@ def parse_page(url):
 def main():
     try:
         urls = [
-            "https://www.olx.pl/dom-ogrod/meble/bielsko-biala/q-oddam/?search%5Border%5D=created_at:desc",
+            # "https://www.olx.pl/dom-ogrod/meble/bielsko-biala/q-oddam/?search%5Border%5D=created_at:desc",
+            # "https://www.olx.pl/nieruchomosci/domy/wynajem/bielsko-biala/?search%5Bdist%5D=5&search%5Border%5D=created_at:desc&search%5Bfilter_float_price:from%5D=1000&search%5Bfilter_float_price:to%5D=3000&search%5Bfilter_float_m:from%5D=60",
+            "https://www.olx.pl/nieruchomosci/domy/wynajem/bielsko-biala/?search%5Bdist%5D=5&search%5Border%5D=created_at:desc&search%5Bfilter_float_price:from%5D=1000&search%5Bfilter_float_price:to%5D=3000",
             # "https://www.olx.pl/sport-hobby/rowery/rowery-gorskie/bielsko-biala/?search%5Bfilter_float_price%3Ato%5D=300",
             # "https://www.olx.pl/oddam-za-darmo/bielsko-biala/?search%5Border%5D=created_at:desc&search%5Bfilter_float_price:from%5D=free",
         ]
