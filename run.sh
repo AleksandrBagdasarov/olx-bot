@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Navigate to the directory containing the docker-compose.yml file
-cd /home/admin/prod/app/olx-bot
+cd /root/olx-bot
 
 # Start the Docker Compose services
 docker-compose up -d
