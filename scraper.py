@@ -162,11 +162,8 @@ def parse_page(url):
 def main():
     try:
         urls = [
-            # "https://www.olx.pl/dom-ogrod/meble/bielsko-biala/q-oddam/?search%5Border%5D=created_at:desc",
-            # "https://www.olx.pl/nieruchomosci/domy/wynajem/bielsko-biala/?search%5Bdist%5D=5&search%5Border%5D=created_at:desc&search%5Bfilter_float_price:from%5D=1000&search%5Bfilter_float_price:to%5D=3000&search%5Bfilter_float_m:from%5D=60",
             "https://www.olx.pl/nieruchomosci/domy/wynajem/bielsko-biala/?search%5Bdist%5D=5&search%5Border%5D=created_at:desc&search%5Bfilter_float_price:from%5D=1000&search%5Bfilter_float_price:to%5D=3000",
-            # "https://www.olx.pl/sport-hobby/rowery/rowery-gorskie/bielsko-biala/?search%5Bfilter_float_price%3Ato%5D=300",
-            # "https://www.olx.pl/oddam-za-darmo/bielsko-biala/?search%5Border%5D=created_at:desc&search%5Bfilter_float_price:from%5D=free",
+            "https://www.olx.pl/nieruchomosci/mieszkania/wynajem/bielsko-biala/?search%5Bfilter_float_price:from%5D=1000&search%5Bfilter_float_price:to%5D=2400&search%5Bfilter_float_m:from%5D=50&search%5Bfilter_enum_rooms%5D%5B0%5D=three",
         ]
         for url in urls:
             hrefs = parse_page(url)
