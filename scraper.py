@@ -20,7 +20,7 @@ def random_sleep():
     sleep((secrets.randbelow(1000) / 1000) + 0.5)
     # return 0
 # Create an event loop
-loop = asyncio.get_event_loop()
+loop = asyncio.new_event_loop()
 
 from mybot import send_message_to_bot, send_notification
 conn = sqlite3.connect('db/scraper.db')
