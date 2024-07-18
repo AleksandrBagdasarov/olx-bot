@@ -8,6 +8,7 @@ import sqlite3
 import requests
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+import argparse
 # from urllib3.util.retry import Retry
 import asyncio
 from time import sleep
@@ -62,7 +63,6 @@ new_links = []
 
 # Set up a headless Selenium WebDriver
 options = webdriver.ChromeOptions()
-options.add_argument("--headless")
 options.add_argument("--no-sandbox")
 options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-gpu")
@@ -70,21 +70,6 @@ options.add_argument("--disable-extensions")
 options.add_argument("--disable-software-rasterizer")
 options.add_argument("--window-size=1920,1200")
 
-
-try:
-    for i in range(5):
-        test_selenium_server_available()
-        break
-except:
-    print("Selenium server is not available")
-    os._exit(1)
-
-driver = webdriver.Remote(
-    command_executor=selenium_url,
-    options=options
-)
-
-# driver = webdriver.Chrome(options=options)
 
 def parse_item(href):
     try:
@@ -102,13 +87,15 @@ def parse_item(href):
         title_container = soup.find('div', attrs={'data-cy': 'ad_title'})
         title = title_container.find('h4').text
 
+        local = soup.find('p', text='Lokalizacja').parent.text or ''
+        local = local.replace('Lokalizacja', '').strip()
         # price_container = soup.find('div', attrs={'data-cy': re.compile('^ad-price')})
         price = [x.text for x in soup.find_all('h3') if 'zł' in x.text][0]
         sleep(10)
         loop.run_until_complete(send_message_to_bot(
             link=f"https://www.olx.pl{href}",
             title=title,
-            price=price,
+            price=f"{price}, {local}",
             imgs=srcs,
             description=description
         ))
@@ -162,8 +149,8 @@ def parse_page(url):
 def main():
     try:
         urls = [
-            "https://www.olx.pl/nieruchomosci/domy/wynajem/bielsko-biala/?search%5Bdist%5D=5&search%5Border%5D=created_at:desc&search%5Bfilter_float_price:from%5D=1000&search%5Bfilter_float_price:to%5D=3000",
-            "https://www.olx.pl/nieruchomosci/mieszkania/wynajem/bielsko-biala/?search%5Bfilter_float_price:from%5D=1000&search%5Bfilter_float_price:to%5D=2400&search%5Bfilter_float_m:from%5D=50&search%5Bfilter_enum_rooms%5D%5B0%5D=three",
+            "https://www.olx.pl/nieruchomosci/domy/wynajem/bielsko-biala/?search%5Bdist%5D=10&search%5Border%5D=created_at:desc&search%5Bfilter_float_price:from%5D=1000&search%5Bfilter_float_price:to%5D=3600",
+            "https://www.olx.pl/nieruchomosci/mieszkania/wynajem/bielsko-biala/?search%5Bfilter_float_price:from%5D=1000&search%5Bfilter_float_price:to%5D=2800&search%5Bfilter_float_m:from%5D=60&search%5Bfilter_enum_rooms%5D%5B0%5D=three",
         ]
         for url in urls:
             hrefs = parse_page(url)
@@ -195,4 +182,25 @@ def main():
 
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser(description="Web scraper")
+    parser.add_argument('--remote', action='store_true', help='Run in remote mode')
+    args = parser.parse_args()
+
+    if args.remote:
+        driver = webdriver.Chrome(options=options)
+    else:
+        options.add_argument("--headless")
+        try:
+            for i in range(5):
+                test_selenium_server_available()
+                break
+        except:
+            print("Selenium server is not available")
+            os._exit(1)
+
+        driver = webdriver.Remote(
+            command_executor=selenium_url,
+            options=options
+        )
     main()

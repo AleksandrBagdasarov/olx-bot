@@ -32,6 +32,7 @@ async def send_message_to_bot(
         price: str,
         imgs: list = None,
         description: str = None,
+        retry: int = 5,
 ):
     if STATUS == "OFF":
         return
@@ -43,7 +44,7 @@ async def send_message_to_bot(
     try:
         message = f"<a href='{link}'><b>{title}</b></a>\n\n"
         if description:
-            message += f"<i>{description}</i>\n\n"
+            message += f"<i>{description[:1000]}</i>\n\n"
         message += f"<b>{price}</b>"
 
         if not imgs:
@@ -61,7 +62,7 @@ async def send_message_to_bot(
             await bot.send_media_group(chat_id=chat_id, media=media, caption=message, parse_mode='HTML', read_timeout=15, write_timeout=15, connect_timeout=15)
     except Exception as e:
         limit = parse_message(e)
-        if limit:
+        if limit and retry > 0:
             time.sleep(limit + 1)
-            await send_message_to_bot(link, title, price, imgs, description)
+            await send_message_to_bot(link, title, price, imgs, description, retry - 1)
             time.sleep(limit)
