@@ -122,8 +122,8 @@ def parse_page(url):
     orders = soup.find_all('div', attrs={'data-cy': 'l-card'})
     total_orders = len(orders)
     for i, order in enumerate(orders):
-        if not "Bielsko-Biała" in (soup.find('p', attrs={"data-testid":"location-date"}).text):
-            continue
+        # if not "Bielsko-Biała" in (soup.find('p', attrs={"data-testid":"location-date"}).text):
+        #     continue
         order_id = order['id']
         if link_exists(order_id):
             continue
